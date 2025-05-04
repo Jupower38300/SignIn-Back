@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des sessions{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Liste des sessions actives</h1>
+    
+    {% if sessions is empty %}
+        <p>Aucune session active pour le moment.</p>
+    {% else %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Date de création</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in sessions %}
+                <tr>
+                    <td>{{ session.id }}</td>
+                    <td>{{ session.name }}</td>
+                    <td>{{ session.createdAt|date('d/m/Y H:i') }}</td>
+                    <td>
+                        <a href="{{ path('session_show', {'id': session.id}) }}" class="btn btn-primary btn-sm">Voir QR Code</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

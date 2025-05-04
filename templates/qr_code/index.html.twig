@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}QR Code pour la session {{ session.name }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>QR Code pour la session {{ session.name }}</h1>
+    
+    <div class="qrcode-container">
+        <img src="{{ path('session_qrcode', {'id': session.id}) }}" alt="QR Code">
+    </div>
+
+    <p>Utilisez ce QR code pour valider votre présence à la session.</p>
+    
+    <a href="{{ path('session_list') }}" class="btn btn-primary">Retour à la liste des sessions</a>
+</div>
+{% endblock %}
