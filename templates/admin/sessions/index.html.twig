@@ -1,0 +1,82 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block main %}
+    {{ parent() }}
+    {# Modal for QR Code #}
+    <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrCodeLabel">QR Code de la session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="qrCodeImage" src="" alt="QR Code" style="max-width: 100%; height: auto; border: 15px solid white;">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.action-qrCode').forEach(btn => {
+            btn.addEventListener('click', function(event) {
+                event.preventDefault();
+                const row = btn.closest('tr');
+                // Assuming the first column contains the session ID
+                const sessionId = row.querySelector('td').textContent.trim();
+                
+                fetch(`/admin/sessions/${sessionId}/qr-code`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let styleIndex = 0;
+                        const styles = ['square', 'circle', 'dot', 'rounded'];
+                        
+                        const updateQRCode = () => {
+                            const style = styles[styleIndex % styles.length];
+                            styleIndex++;
+                            const newSrc = `${data.url}?style=${encodeURIComponent(style)}&t=${Date.now()}`;
+                            document.getElementById('qrCodeImage').src = newSrc;
+                        };
+                        
+                        // Initial QR code update
+                        updateQRCode();
+                        
+                        // Update every 2 seconds
+                        const intervalId = setInterval(updateQRCode, 2000);
+                        
+                        // Clear interval on modal close
+                        const modal = document.getElementById('qrCodeModal');
+                        modal.addEventListener('hidden.bs.modal', () => {
+                            clearInterval(intervalId);
+                        });
+                        
+                        // Show the modal
+                        new bootstrap.Modal(modal).show();
+                    })
+                    .catch(console.error);
+            });
+        });
+    });
+    </script>
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <style>
+        #qrCodeImage {
+            width: 400px;
+            height: 400px;
+            object-fit: contain;
+        }
+        @media (max-width: 576px) {
+            #qrCodeImage {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+{% endblock %}

@@ -96,7 +96,7 @@ class User
         return $this;
     }
 
-    public function getRole(): ?string
+    public function getRole(): ?Role
     {
         return $this->role;
     }
@@ -104,7 +104,6 @@ class User
     public function setRole(Role $role): static
     {
         $this->role = $role;
-
         return $this;
     }
 
@@ -166,5 +165,11 @@ class User
         }
 
         return $this;
+    }
+
+
+    public function __toString(): string
+    {
+        return sprintf('%s %s', $this->firstName, $this->lastName);
     }
 }

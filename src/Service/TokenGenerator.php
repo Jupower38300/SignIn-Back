@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Service;
 
 class TokenGenerator
@@ -7,32 +6,25 @@ class TokenGenerator
     private string $secretKey;
     private int $intervalDuration;
 
-    public function __construct(string $secretKey = 'your_secret_key_here', int $intervalDuration = 300)
+    public function __construct(string $secretKey = 'your_secret_key_here', int $intervalDuration = 30)
     {
         $this->secretKey = $secretKey;
-        $this->intervalDuration = $intervalDuration; 
-    }
-
-    public function generateToken(int $sessionId, int $interval): string
-    {
-        $data = $sessionId . '|' . $interval . '|' . $this->secretKey;
-        return hash('sha256', $data);
+        $this->intervalDuration = $intervalDuration;
     }
 
     public function getCurrentInterval(): int
     {
-        return (int)(time() / $this->intervalDuration);
+        return 0; // Désactive la rotation temporelle
     }
 
-    public function validateToken(int $sessionId, string $token): bool
+    public function getRemainingTime(): int
     {
-        $currentInterval = $this->getCurrentInterval();
-        
-        $validTokens = [
-            $this->generateToken($sessionId, $currentInterval),
-            $this->generateToken($sessionId, $currentInterval - 1)
-        ];
+        return $this->intervalDuration; // Temps fixe
+    }
 
-        return in_array($token, $validTokens);
+    public function generateToken(int $sessionId, int $interval): string
+    {
+        // Version statique pour le debug
+        return hash_hmac('sha256', (string)$sessionId, $this->secretKey, false);
     }
 }

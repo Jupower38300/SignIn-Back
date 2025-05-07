@@ -28,6 +28,7 @@ class Sessions
     #[ORM\ManyToOne(inversedBy: 'formateur')]
     private ?User $formateur = null;
 
+
     /**
      * @var Collection<int, Presences>
      */
@@ -98,6 +99,7 @@ class Sessions
 
         return $this;
     }
+
 
     /**
      * @return Collection<int, Presences>
