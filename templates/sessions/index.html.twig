@@ -5,131 +5,284 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
+
+        .action {
+            text-align:center;
         }
-        
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-            border-radius: 5px;
+
+        .action .btn {
+            text-decoration:none;
+            color: white;
+            padding: 15px 20px;
+            background:rgb(0, 71, 143);
+            border-radius: 10px;
+
         }
-        
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+
+        .container.py-5 {
+            max-width: 1200px;
+        }
+
+        h1.h3 {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        .container.py-5 {
+            max-width: 1200px;
+        }
+
+        h1.h3 {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .title {
+            display:flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 4em;
+            margin-top: 4em;
+            margin-left: 2em;
+        }
+
+        .title .h3 {
+            margin-right: 20px;
+        }
+
+        button {
             cursor: pointer;
         }
-        
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
+
+        .table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+            border: none;
+            width:80%;
+        }
+
+        .table thead th {
+            background: #f8f9fa;
+            color: #6c757d;
+            font-weight: 600;
+            padding: 1.2rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .table tbody td {
+            padding: 1rem 1.2rem;
+            vertical-align: middle;
+            border-color: #e9ecef;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #3bd977 0%, #2db85c 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .table-responsive {
+            display:flex;
+            justify-content:center;
+            margin-top: 20px;
+        }
+
+        /* Style original de la modale (restauré) */
+        .modal {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1050;
+            padding: 2rem;
+        }
+
+        .modal-content-modern {
+            background: #fff;
+            padding: 2rem 2.5rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-in-out;
+            position: relative;
+        }
+
+        .modal-content-modern .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .form-control-modern {
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Conserve le style moderne du reste */
+        .table-hover tbody tr:hover {
+            background-color: #f8fafc;
         }
     </style>
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Liste des Sessions</h1>
-        <button id="openModalBtn" class="btn btn-primary">Créer une session</button>
+<div class="container py-5">
+    <div class="title">
+        <h1 class="h3">📋 Liste des Sessions</h1>
+        <button id="openModalBtn" class="btn btn-success shadow">
+            + Nouvelle session
+        </button>
     </div>
-    
+
     {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endfor %}
-    
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nom</th>
-                <!-- Ajoutez d'autres colonnes selon votre entité -->
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for session in sessions %}
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
                 <tr>
-                    <td>{{ session.id }}</td>
-                    <td>{{ session.nomSession }}</td>
-                    <!-- Ajoutez d'autres propriétés selon votre entité -->
-                    <td>
-                        <a href="{{ path('session_show', {'id': session.id}) }}" class="btn btn-primary btn-sm">
-                            Voir QR Code
-                        </a>
-                    </td>
+                    <th scope="col" style="width: 80px;">#</th>
+                    <th scope="col">Nom de la session</th>
+                    <th scope="col" style="width: 150px;">Actions</th>
                 </tr>
-            {% else %}
-                <tr>
-                    <td colspan="3">Aucune session trouvée</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for session in sessions %}
+                    <tr>
+                        <td class="text-muted">{{ session.id }}</td>
+                        <td>
+                            <span class="fw-medium">{{ session.nomSession }}</span>
+                            <div class="text-muted small mt-1">
+                                {{ session.dateStart|date('d/m/Y') }} - {{ session.dateEnd|date('d/m/Y') }}
+                            </div>
+                        </td>
+                        <td class="action">
+                            <a href="{{ path('session_show', {'id': session.id}) }}" 
+                               class="btn btn-outline-primary btn-sm">
+                                Voir QR Code
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center py-5">
+                            <div class="text-muted mb-3">📭 Aucune session trouvée</div>
+                            <button id="openModalBtn" class="btn btn-sm btn-outline-success">
+                                Créer une première session
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Modal pour créer une session -->
 <div id="createSessionModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content-modern">
         <span class="close">&times;</span>
-        <h2>Créer une nouvelle session</h2>
-        
+        <h2 class="text-center mb-4 fw-semibold">Créer une nouvelle session</h2>
         {{ form_start(form) }}
-            <div class="mb-3">
-                {{ form_label(form.nom_session) }}
-                {{ form_widget(form.nom_session) }}
-                {{ form_errors(form.nom_session) }}
-            </div>
-            
-            <!-- Ajoutez d'autres champs de formulaire ici si nécessaire -->
-            
-            <div class="text-end">
-                <button type="submit" class="btn btn-success">Enregistrer</button>
+            <div class="d-flex flex-column gap-3">
+                <div class="form-input">
+                    {{ form_label(form.nom_session, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.nom_session, {'attr': {'class': 'form-control form-control-modern'}}) }}
+                </div>
+
+                <div class="form-input">
+                    {{ form_label(form.date_start, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.date_start, {'attr': {'class': 'form-control form-control-modern'}}) }}
+                </div>
+
+                <div class="form-input">
+                    {{ form_label(form.date_end, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.date_end, {'attr': {'class': 'form-control form-control-modern'}}) }}
+                </div>
+
+                <div class="form-input">
+                    {{ form_label(form.formateur, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.formateur, {'attr': {'class': 'form-select form-control-modern'}}) }}
+                </div>
+
+                <div class="text-center pt-3">
+                    <button type="submit" class="btn btn-primary px-5 py-2 shadow-sm rounded-pill">
+                        💾 Enregistrer
+                    </button>
+                </div>
             </div>
         {{ form_end(form) }}
     </div>
 </div>
-
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var modal = document.getElementById("createSessionModal");
-            var btn = document.getElementById("openModalBtn");
-            var span = document.getElementsByClassName("close")[0];
-            
-            // Ouvrir la modal quand on clique sur le bouton
-            btn.onclick = function() {
-                modal.style.display = "block";
-            }
-            
-            // Fermer la modal quand on clique sur la croix
-            span.onclick = function() {
-                modal.style.display = "none";
-            }
-            
-            // Fermer la modal si on clique en dehors
-            window.onclick = function(event) {
-                if (event.target == modal) {
+            const modal = document.getElementById("createSessionModal");
+            const btn = document.getElementById("openModalBtn");
+            const span = document.getElementsByClassName("close")[0];
+
+            btn.onclick = () => modal.style.display = "flex";
+            span.onclick = () => modal.style.display = "none";
+            window.onclick = (event) => {
+                if (event.target === modal) {
                     modal.style.display = "none";
                 }
             }
