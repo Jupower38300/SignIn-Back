@@ -6,7 +6,7 @@ class TokenGenerator
     private string $secretKey;
     private int $intervalDuration;
 
-    public function __construct(string $secretKey = 'your_secret_key_here', int $intervalDuration = 30)
+    public function __construct(string $secretKey = 'secret', int $intervalDuration = 2)
     {
         $this->secretKey = $secretKey;
         $this->intervalDuration = $intervalDuration;
@@ -14,17 +14,22 @@ class TokenGenerator
 
     public function getCurrentInterval(): int
     {
-        return 0; // Désactive la rotation temporelle
+        return (int) floor(time() / $this->intervalDuration);
+    }
+
+    public function generateToken(string $sessionId): string
+    {
+        $interval = $this->getCurrentInterval();
+        return hash_hmac('sha256', $sessionId . '|' . $interval, $this->secretKey);
+    }
+
+    public function getIntervalDuration(): int
+    {
+        return $this->intervalDuration;
     }
 
     public function getRemainingTime(): int
     {
-        return $this->intervalDuration; // Temps fixe
-    }
-
-    public function generateToken(int $sessionId, int $interval): string
-    {
-        // Version statique pour le debug
-        return hash_hmac('sha256', (string)$sessionId, $this->secretKey, false);
+        return $this->intervalDuration - (time() % $this->intervalDuration);
     }
 }

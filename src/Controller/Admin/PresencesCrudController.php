@@ -26,7 +26,15 @@ class PresencesCrudController extends AbstractCrudController
             AssociationField::new('presences_session', 'ID Séance')
                 ->formatValue(fn ($v, $e) => $e->getPresencesSession()?->getId()),
 
-            TextField::new('signature'),
+                TextField::new('signature')
+                ->onlyOnIndex()
+                ->formatValue(fn ($value) => sprintf(
+                    '<img src="%s" style="height: 60px; background-color: #f0f0f0; padding: 4px; border-radius: 4px;" />',
+                    $value
+                ))
+                ->renderAsHtml(),
+            
+            
             DateTimeField::new('horodatage'),
         ];
     }

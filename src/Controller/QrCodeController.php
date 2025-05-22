@@ -24,30 +24,28 @@ class QrCodeController extends AbstractController
     #[Route('/session/{id}/qrcode', name: 'session_qrcode')]
     public function showQrCode(
         TokenGenerator $tokenGenerator,
-        int $id
+        int $id,
+        Request $request
     ): Response {
         $session = $this->entityManager->getRepository(Sessions::class)->find($id);
         if (!$session) {
             throw $this->createNotFoundException('Session non trouvée');
         }
     
-        // Calcule l'intervalle actuel basé sur le temps Unix
-        $currentInterval = $tokenGenerator->getCurrentInterval();
+        // Si on reçoit l'intervalle du client, on l'utilise ; sinon on calcule l'actuel
+        $interval = $request->query->getInt('interval', $tokenGenerator->getCurrentInterval());
     
-        // Génère le contenu du QR code
         $qrContent = sprintf(
             '%s|%s',
             $session->getId(),
-            $tokenGenerator->generateToken($session->getId(), $currentInterval)
+            $tokenGenerator->generateToken($session->getId())
         );
     
-        // Configure le style du QR Code
         $builder = new Builder(
             writer: new PngWriter(),
             writerOptions: [],
             data: $qrContent,
-            encoding: new Encoding('UTF-8'),  
-    
+            encoding: new Encoding('UTF-8'),
             size: 400,
             margin: 20
         );
@@ -63,8 +61,7 @@ class QrCodeController extends AbstractController
             ]
         );
     }
-    
-    // Modifiez la méthode showQrCodePage
+
     #[Route('/session/{id}/qrcode/page', name: 'session_qrcode_page')]
     public function showQrCodePage(int $id, TokenGenerator $tokenGenerator): Response
     {
@@ -73,18 +70,14 @@ class QrCodeController extends AbstractController
             throw $this->createNotFoundException('Session non trouvée');
         }
     
-        // Fixe l'intervalle initial
         $initialInterval = $tokenGenerator->getCurrentInterval();
-        $qrCodeUrl = $this->generateUrl('session_qrcode', [
-            'id' => $id,
-            'interval' => $initialInterval
-        ]);
+        $qrCodeUrl = $this->generateUrl('session_qrcode', ['id' => $id]);
     
-        return $this->render('session/qrcode.html.twig', [
+        return $this->render('sessions/qrcode.html.twig', [
             'session' => $session,
             'qrCodeUrl' => $qrCodeUrl,
-            'initialInterval' => $initialInterval
+            'initialInterval' => $initialInterval,
+            'intervalDuration' => $tokenGenerator->getIntervalDuration() // en secondes
         ]);
     }
-
 }

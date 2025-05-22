@@ -10,6 +10,18 @@
             text-align:center;
         }
 
+        .admin {
+            display:flex;
+            background: linear-gradient(135deg,rgb(61, 16, 87) 0%,rgb(40, 6, 63) 100%);
+            padding:10px 25px;
+            border-radius:10px;
+            color: white;
+            text-decoration:none;
+            margin-left:10px;
+            font-weight: bold;
+        }
+        
+
         .action .btn {
             text-decoration:none;
             color: white;
@@ -34,8 +46,9 @@
         }
 
         body {
-            background: #f8f9fa;
+            background:rgb(7, 7, 7);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            text-align:center;
         }
 
         .container.py-5 {
@@ -43,7 +56,7 @@
         }
 
         h1.h3 {
-            color: #2c3e50;
+            color:white;
             font-weight: 700;
             font-size: 2rem;
             margin: 0;
@@ -86,15 +99,22 @@
             border-bottom: 2px solid #e9ecef;
         }
 
+        span {
+            color: #6c757d;
+        }
+
         .table tbody td {
             padding: 1rem 1.2rem;
             vertical-align: middle;
             border-color: #e9ecef;
+            color: #6c757d;
         }
 
         .btn-success {
             background: linear-gradient(135deg, #3bd977 0%, #2db85c 100%);
             border: none;
+            text-decoration: none;
+            color:black;
             border-radius: 8px;
             padding: 0.75rem 1.5rem;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -104,6 +124,7 @@
             display:flex;
             justify-content:center;
             margin-top: 20px;
+            
         }
 
         /* Style original de la modale (restauré) */
@@ -184,6 +205,11 @@
         <button id="openModalBtn" class="btn btn-success shadow">
             + Nouvelle session
         </button>
+
+        <a href="{{ path('admin') }}" 
+            class="admin">
+            Voir Admin
+        </a>
     </div>
 
     {% for message in app.flashes('success') %}

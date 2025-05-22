@@ -1,55 +1,100 @@
 {% extends 'base.html.twig' %}
 {% block title %}QR Code pour la session {{ session.nomSession }}{% endblock %}
+{% block stylesheet %}
+{{ parent() }}
+<style>
+
+/* Style pour le conteneur QR code pour l'améliorer aussi */
+.qrcode-container {
+    margin: 60px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+#qr-code {
+    border: 15px solid white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.session-details {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.container h1 {
+    color: rgb(61, 16, 87);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Icône pour le bouton */
+.sessions-btn .icon {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.btn-container {
+    margin-top: 20px;
+}
+</style>
+{% endblock %}
+
 {% block body %}
 <div class="container">
     <h1>QR Code pour la session {{ session.nomSession }}</h1>
+    
     <div class="session-details">
         <p><strong>ID:</strong> {{ session.id }}</p>
         {% if session.dateStart %}
-        <p><strong>Date:</strong> {{ session.dateStart|date('Y-m-d H:i') }}</p>
+            <p><strong>Date:</strong> {{ session.dateStart|date('Y-m-d H:i') }}</p>
         {% endif %}
     </div>
+    
     <div class="qrcode-container text-center">
         <h2>QR Code</h2>
-        <img id="qrCodeImage" src="{{ qrCodeUrl }}"
-            alt="QR Code"
-            style="width: 400px; height: 400px; border: 15px solid white;"/>
-        <p id="countdown" class="mt-3">Le QR code sera actualisé dans <span id="timer">30</span> secondes</p>
+        <img id="qr-code" src="{{ qrCodeUrl }}"
+             alt="QR Code"
+             style="width: 400px; height: 400px;"/>
     </div>
-    <div class="actions mt-4">
-        <a href="{{ path('session_list') }}" class="btn btn-secondary">Retour à la liste</a>
+    
+    <div class="btn-container text-center">
+        <a href="{{ path('session_list') }}" class="btn-success">
+            Liste des sessions
+        </a>
     </div>
 </div>
 {% endblock %}
+
 {% block javascripts %}
 {{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const qrCodeImage = document.getElementById('qrCodeImage');
-    const timerElement = document.getElementById('timer');
-    let secondsLeft = 30;
-
+    const qrCodeImage = document.getElementById('qr-code');
+    let secondsLeft = 5;
+    
     function updateTimer() {
         secondsLeft -= 1;
-        timerElement.textContent = secondsLeft;
-
         if (secondsLeft <= 0) {
-            // Réinitialise le compteur
-            secondsLeft = 30;
-
-            // Ajoute un paramètre aléatoire pour éviter le cache
+            // Reset the counter
+            secondsLeft = 5;
+            // Add a random parameter to avoid cache
             const timestamp = Date.now();
             const randomParam = Math.floor(Math.random() * 1000000);
-            const newSrc = '{{ path("session_qrcode", {"id": session.id}) }}' + 
-                           '?t=' + timestamp + 
-                           '&r=' + randomParam;
-
-            // Met à jour l'image du QR code
+            const newSrc = '{{ path("session_qrcode", {"id": session.id}) }}' +
+                '?t=' + timestamp +
+                '&r=' + randomParam;
+            // Update the QR code image
             qrCodeImage.src = newSrc;
         }
     }
-
-    // Met à jour le timer chaque seconde
+    
+    // Update the timer every second
     setInterval(updateTimer, 1000);
 });
 </script>
