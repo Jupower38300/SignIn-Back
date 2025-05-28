@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Repository\PresencesRepository;
+use App\Repository\SessionsRepository;
 
 class SessionsController extends AbstractController
 {
@@ -69,4 +70,7 @@ class SessionsController extends AbstractController
             'presences' => $presences,
         ]);
     }
+
+
+
 }

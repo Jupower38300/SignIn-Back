@@ -114,32 +114,3 @@
 
 
 {% endblock %}
-
-{% block javascripts %}
-{{ parent() }}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const qrCodeImage = document.getElementById('qr-code');
-    let secondsLeft = 5;
-    
-    function updateTimer() {
-        secondsLeft -= 1;
-        if (secondsLeft <= 0) {
-            // Reset the counter
-            secondsLeft = 5;
-            // Add a random parameter to avoid cache
-            const timestamp = Date.now();
-            const randomParam = Math.floor(Math.random() * 1000000);
-            const newSrc = '{{ path("session_qrcode", {"id": session.id}) }}' +
-                '?t=' + timestamp +
-                '&r=' + randomParam;
-            // Update the QR code image
-            qrCodeImage.src = newSrc;
-        }
-    }
-    
-    // Update the timer every second
-    setInterval(updateTimer, 1000);
-});
-</script>
-{% endblock %}
