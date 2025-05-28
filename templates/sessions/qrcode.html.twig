@@ -69,6 +69,50 @@
         </a>
     </div>
 </div>
+
+<div class="connected-students" style="margin-top: 3em;">
+    <h2 class="text-center" style="color: white;">Étudiants connectés</h2>
+    
+    {% if presences is not empty %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover mt-4">
+                <thead class="thead-dark">
+                    <tr class="text-center">
+                        <th>#</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Date de connexion</th>
+                        <th>Signature</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for presence in presences %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ presence.presenceUser.lastName }}</td>
+                            <td>{{ presence.presenceUser.firstName }}</td>
+                            <td>{{ presence.horodatage ? presence.horodatage|date('Y-m-d H:i:s') : 'Non renseigné' }}</td>
+                            <td>
+                                {% if presence.signature %}
+                                    <img src="{{ presence.signature }}" 
+                                        style="height: 60px; background-color: #f0f0f0; padding: 4px; border-radius: 4px;" 
+                                        alt="Signature" />
+                                {% else %}
+                                    <em>Aucune</em>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    {% else %}
+        <p class="text-center text-muted">Aucun étudiant connecté pour cette session.</p>
+    {% endif %}
+</div>
+
+
 {% endblock %}
 
 {% block javascripts %}

@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Entity\Presences;
+use App\Enum\Role;
 use App\Entity\Sessions;
 use App\Entity\User;
 use App\Service\TokenGenerator;
@@ -229,4 +230,56 @@ class ApiController extends AbstractController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    #[Route('/users', name: 'api_create_user', methods: ['POST'])]
+    public function createUser(Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return $this->json(['error' => 'JSON invalide: ' . json_last_error_msg()], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Vérifier les champs obligatoires
+            $requiredFields = ['firstName', 'lastName', 'email', 'role'];
+            foreach ($requiredFields as $field) {
+                if (empty($data[$field])) {
+                    return $this->json(['error' => "Le champ '$field' est obligatoire."], Response::HTTP_BAD_REQUEST);
+                }
+            }
+
+            // Valider que le role envoyé correspond à un Role enum valide
+            $roleValue = strtolower($data['role']);
+            $validRoles = array_map(fn($r) => $r->value, \App\Enum\Role::cases());
+            if (!in_array($roleValue, $validRoles, true)) {
+                return $this->json(['error' => "Rôle invalide. Rôles possibles : " . implode(', ', $validRoles)], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Vérifier que l'email n'existe pas déjà
+            $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
+            if ($existingUser) {
+                return $this->json(['error' => 'Un utilisateur avec cet email existe déjà.'], Response::HTTP_CONFLICT);
+            }
+
+            // Création de l'utilisateur
+            $user = new User();
+            $user->setFirstName($data['firstName']);
+            $user->setLastName($data['lastName']);
+            $user->setEmail($data['email']);
+            $user->setRole(Role::from($roleValue));
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'message' => 'Utilisateur créé avec succès',
+                'userId' => $user->getId()
+            ], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            return $this->json([
+                'error' => 'Erreur serveur: ' . $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\Repository\PresencesRepository;
 
 class SessionsController extends AbstractController
 {
@@ -50,18 +51,22 @@ class SessionsController extends AbstractController
     }
     
     #[Route('/session/{id}', name: 'session_show')]
-    public function show(Sessions $session): Response
+    public function show(Sessions $session, PresencesRepository $presencesRepository): Response
     {
-        // Generate the QR code URL
+        // Génération de l'URL du QR Code
         $qrCodeUrl = $this->generateUrl(
             'session_qrcode',
             ['id' => $session->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
-        
+
+        // Récupération des présences associées à cette session
+        $presences = $presencesRepository->findBy(['presences_session' => $session]);
+
         return $this->render('sessions/qrcode.html.twig', [
             'session' => $session,
-            'qrCodeUrl' => $qrCodeUrl
+            'qrCodeUrl' => $qrCodeUrl,
+            'presences' => $presences,
         ]);
     }
 }
